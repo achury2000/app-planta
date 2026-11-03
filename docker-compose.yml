@@ -1,0 +1,50 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: planta-mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: secreto123
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mongosh",
+          "-u",
+          "admin",
+          "-p",
+          "secreto123",
+          "--quiet",
+          "--eval",
+          "db.adminCommand('ping').ok",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+  backend:
+    build: ./backend
+    container_name: planta-backend
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./backend/.env
+    environment:
+      MONGO_URI: mongodb://admin:secreto123@mongo:27017/plantatransformacion?authSource=admin
+    restart: unless-stopped
+  seed:
+    build: ./backend
+    container_name: planta-seed
+    command: ["node", "src/seed.js"]
+    environment:
+      MONGO_URI: mongodb://admin:secreto123@mongo:27017/plantatransformacion?authSource=admin
+    depends_on:
+      mongo:
+        condition: service_healthy
+    restart: "no"
+volumes:
+  mongo_data:
