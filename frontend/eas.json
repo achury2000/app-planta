@@ -12,10 +12,22 @@
       "distribution": "internal",
       "env": {
         "EXPO_PUBLIC_API_URL": "https://pruebas1-1.tail033823.ts.net/planta/api"
+      },
+      "android": {
+        "buildType": "apk"
       }
     },
     "production": {
       "autoIncrement": true
+    },
+    "apk": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_DEMO": "1"
+      }
     }
   },
   "submit": {
